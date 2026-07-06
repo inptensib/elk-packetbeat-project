@@ -1,15 +1,6 @@
 # Fichier d'environnement reel (ne jamais committer)
 .env
 
-# Captures reseau (potentiellement sensibles et volumineuses)
-pcaps/*.pcap
-pcaps/*.pcapng
-pcaps/*.cap
-
-# Exports Kibana
-exports/*
-!exports/.gitkeep
-
 # Fichiers systeme
 .DS_Store
 Thumbs.db
