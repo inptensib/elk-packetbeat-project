@@ -1,0 +1,93 @@
+###################### PacketBeat Configuration - ELK Stack PCAP Analysis #####################
+
+# ======================== Packetbeat global options ===========================
+
+packetbeat.interfaces:
+  # Read from a PCAP file instead of a live interface.
+  # Overridden at runtime via -E packetbeat.interfaces.file=... in run-packetbeat.sh
+  type: pcap
+  file: /pcaps/sample.pcap
+
+# ====================== Protocols to capture ==================================
+
+packetbeat.protocols:
+
+  - type: icmp
+    enabled: true
+
+  - type: dns
+    enabled: true
+    ports: [53]
+    include_authorities: true
+    include_additionals: true
+
+  - type: http
+    enabled: true
+    ports: [80, 8080, 8000, 5000, 8002]
+    send_headers: true
+    send_request: true
+    send_response: true
+
+  - type: tls
+    enabled: true
+    ports: [443, 8443, 993, 995, 5223]
+
+  - type: dhcp
+    enabled: true
+    ports: [67, 68]
+
+  - type: mysql
+    enabled: true
+    ports: [3306]
+
+  - type: redis
+    enabled: true
+    ports: [6379]
+
+  - type: mongodb
+    enabled: true
+    ports: [27017]
+
+  - type: pgsql
+    enabled: true
+    ports: [5432]
+
+# ======================== Flows (network connections) =========================
+
+packetbeat.flows:
+  enabled: true
+  timeout: 30s
+  period: 10s
+
+# ======================== Output: Elasticsearch ================================
+
+output.elasticsearch:
+  hosts: ["${ELASTICSEARCH_HOST:http://elasticsearch:9200}"]
+  index: "packetbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+
+setup.template.name: "packetbeat"
+setup.template.pattern: "packetbeat-*"
+setup.template.settings:
+  index.number_of_shards: 1
+  index.number_of_replicas: 0
+
+# ======================== Kibana setup ========================================
+
+setup.kibana:
+  host: "kibana:5601"
+
+setup.dashboards.enabled: true
+
+# ======================== Logging =============================================
+
+logging.level: info
+logging.to_files: false
+logging.to_stderr: true
+
+logging.metrics.enabled: false
+
+# ======================== Processors ==========================================
+
+processors:
+  - add_host_metadata: {}
+  - add_cloud_metadata: {}
